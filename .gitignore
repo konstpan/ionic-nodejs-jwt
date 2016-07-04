@@ -6,4 +6,4 @@ platforms/
 plugins/
 www/lib/
 npm-debug.log*
-nbproject/
+/nbproject/
