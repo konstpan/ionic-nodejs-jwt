@@ -2,7 +2,14 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope) {})
 
-.controller('ChatsCtrl', function($scope, $ionicLoading, Chats) {
+.controller('LoginCtrl', function($scope, $state) {
+  $scope.signIn = function(user) {
+    
+    $state.go('tab.dash');
+  };
+})
+
+.controller('ChatsCtrl', function($scope, $ionicLoading, $ionicPopup, $state, Chats) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -11,20 +18,46 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
   $ionicLoading.show();
-  Chats.all().then(function(resp) {
-    $scope.chats = resp.data;
+  Chats.all().then(
+    function success(resp) {
+      $scope.chats = resp.data;
     
-    $ionicLoading.hide();
-  });
+      $ionicLoading.hide();
+    },
+    function error(resp) {
+      $ionicLoading.hide();
+      $ionicPopup
+      .alert(
+        {
+          title: 'Authentication Error',
+          template: 'You must be logged in.'
+        }
+      )
+      .then(function() {$state.go('login')});
+    }
+  );
   
   $scope.remove = function(chat) {
     $ionicLoading.show();
     
-    Chats.remove(chat).then(function(resp) {
-      $scope.chats = resp.data;
+    Chats.remove(chat).then(
+      function success(resp) {
+        $scope.chats = resp.data;
       
-      $ionicLoading.hide();
-    });
+        $ionicLoading.hide();
+      },
+      function error(resp) {
+        $ionicLoading.hide();
+        $ionicPopup
+        .alert(
+          {
+            title: 'Authentication Error',
+            template: 'You must be logged in.'
+          }
+        )
+        .then(function() {$state.go('login')});
+      }
+    );
   };
 })
 
@@ -38,10 +71,4 @@ angular.module('starter.controllers', [])
     
     $ionicLoading.hide();
   });
-})
-
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
 });

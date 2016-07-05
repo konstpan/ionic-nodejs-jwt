@@ -1,5 +1,9 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 var port = process.env.PORT || 8180;
 
@@ -38,8 +42,15 @@ var chats = [
 
 var router = express.Router(); // get an instance of the express Router
 
-// middleware to use for all requests
+// route to authenticate
+router.get('/authenticate', function(req, res) {
+  res.json({});
+});
+
+// middleware to use for all requests below and protect routes
 router.use(function(req, res, next) {
+  var auth = false;
+  
   // enable CORS
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers",
@@ -47,8 +58,21 @@ router.use(function(req, res, next) {
   res.header("Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS");
       
-   // make sure we go to the next routes and don't stop here
-   next();
+  // retrieve token
+  var token = req.get('Authorization');
+  
+  // decode token
+  if (token) {
+    console.log( 'Authorization header: ' + req.get('Authorization') );
+  }
+  
+  if (auth) {
+    // authentication is ok, move to next routes
+    next();
+  }
+  else {
+    res.status(403).json({error: 'not authorized'});
+  }
 });
 
 router.get('/chats', function(req, res) {
@@ -77,6 +101,7 @@ router.delete('/chats/:id', function(req, res) {
   res.json(chats);
 });
 
+// apply routes to our application
 app.use('/api', router);
 
 // START THE SERVER
