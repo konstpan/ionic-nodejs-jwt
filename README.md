@@ -6,6 +6,7 @@ REST API is implemented in nodejs and mobile app is built using ionic + angularj
 Open two command prompts (terminals in unix), change directory to project and type:
 
 $ npm install  
+$ bower install  
 $ npm start
 
 and in second prompt:  
