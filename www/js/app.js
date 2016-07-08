@@ -7,24 +7,29 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-
     }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    
+    $rootScope.$on('$ionicView.beforeEnter', function(evnt, data) {
+			if (data.stateId !== 'login') {
+        // TODO: if not authenticated do not enter view and redirect to login page
+        console.log('if not authenticated do not enter view and redirect to login page');
+			}
+		});
   });
 })
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
-
   // disable ionic cache globally
   $ionicConfigProvider.views.maxCache(0);
   
@@ -81,5 +86,4 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/login');
-
 });

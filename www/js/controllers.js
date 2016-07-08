@@ -2,10 +2,20 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope) {})
 
-.controller('LoginCtrl', function($scope, $state) {
-  $scope.signIn = function(user) {
-    
-    $state.go('tab.dash');
+.controller('LoginCtrl', function($scope, $state, $ionicPopup, $http) {
+  $scope.login = function(user) {
+    $http({
+      method: 'POST',
+      url: 'http://localhost:8180/api/authenticate',
+      data: {user: user}
+    }).then(function(resp) {
+      $state.go('tab.dash');
+    }, function() {
+      $ionicPopup.alert({
+        title: 'Authentication Error',
+        template: 'Can\'t find user'
+      });
+    });
   };
 })
 
@@ -26,14 +36,13 @@ angular.module('starter.controllers', [])
     },
     function error(resp) {
       $ionicLoading.hide();
-      $ionicPopup
-      .alert(
-        {
-          title: 'Authentication Error',
-          template: 'You must be logged in.'
-        }
-      )
-      .then(function() {$state.go('login')});
+      
+      $ionicPopup.alert({
+        title: 'Authentication Error',
+        template: 'You must be logged in.'
+      }).then(function() {
+        $state.go('login')
+      });
     }
   );
   
@@ -48,14 +57,13 @@ angular.module('starter.controllers', [])
       },
       function error(resp) {
         $ionicLoading.hide();
-        $ionicPopup
-        .alert(
-          {
-            title: 'Authentication Error',
-            template: 'You must be logged in.'
-          }
-        )
-        .then(function() {$state.go('login')});
+        
+        $ionicPopup.alert({
+          title: 'Authentication Error',
+          template: 'You must be logged in.'
+        }).then(function() {
+          $state.go('login')
+        });
       }
     );
   };

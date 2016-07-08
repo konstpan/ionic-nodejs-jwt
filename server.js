@@ -1,11 +1,17 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var jwt = require('jwt-simple');
 var app = express();
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+// parse application/json
+app.use(bodyParser.json()); 
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var port = process.env.PORT || 8180;
+
+var secret = 'xxx';
 
 var chats = [
   {
@@ -42,22 +48,39 @@ var chats = [
 
 var router = express.Router(); // get an instance of the express Router
 
-// route to authenticate
-router.get('/authenticate', function(req, res) {
-  res.json({});
+// enable CORS to our webserver
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Content-Length, Accept");
+  res.header("Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS");
+  
+  if (req.method === 'OPTIONS') res.status(200).end();
+  else next();
+});
+
+// route to authenticate open to everybody
+router.post('/authenticate', function(req, res) {
+  if (req.body.user && req.body.user.username === 'john' && req.body.user.password === 'doe') {
+    // payload is the claim we trust server side
+    var payload = {"authenticated": "true", "usergroup": "users"};
+    payload.username = req.body.user.username;
+    
+    // token = header.payload.digest
+    var token = jwt.encode(payload, secret);
+    
+    res.json({success: "true", "token": token});
+  }
+  else {
+    res.status(403).json({error: 'invalid credentials'});
+  }
 });
 
 // middleware to use for all requests below and protect routes
 router.use(function(req, res, next) {
   var auth = false;
   
-  // enable CORS
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS");
-      
   // retrieve token
   var token = req.get('Authorization');
   
