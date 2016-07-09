@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, $rootScope) {
+.run(function($ionicPlatform, $rootScope, $state, AuthService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -20,10 +20,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       StatusBar.styleDefault();
     }
     
-    $rootScope.$on('$ionicView.beforeEnter', function(evnt, data) {
-			if (data.stateId !== 'login') {
-        // TODO: if not authenticated do not enter view and redirect to login page
-        console.log('if not authenticated do not enter view and redirect to login page');
+    $rootScope.$on('$stateChangeStart', function(event, next, nextParams, fromState) {
+			if (next.name !== 'login' && AuthService.isAuthenticated === false) {
+        event.preventDefault();
+				$state.go('login');
 			}
 		});
   });

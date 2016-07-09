@@ -1,25 +1,29 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope) {})
-
-.controller('LoginCtrl', function($scope, $state, $ionicPopup, $http) {
-  $scope.login = function(user) {
-    $http({
-      method: 'POST',
-      url: 'http://localhost:8180/api/authenticate',
-      data: {user: user}
-    }).then(function(resp) {
-      $state.go('tab.dash');
-    }, function() {
-      $ionicPopup.alert({
-        title: 'Authentication Error',
-        template: 'Can\'t find user'
-      });
-    });
-  };
+// top level controller
+.controller('AppCtrl', function($scope, $state, AuthService) {
+	$scope.logout = function() {
+		AuthService.logout();
+		$state.go('login');
+	};
 })
 
-.controller('ChatsCtrl', function($scope, $ionicLoading, $ionicPopup, $state, Chats) {
+.controller('DashCtrl', function($scope) {})
+
+.controller('LoginCtrl', function($scope, $state, $ionicPopup, $http, AuthService) {
+	$scope.login = function(user) {
+    AuthService.login(user).then(function(token) {
+			$state.go('tab.dash');
+		}, function() {
+			$ionicPopup.alert({
+        title: 'Authentication Error',
+        template: 'Wrong username or password'
+      });
+		});
+	};
+})
+
+.controller('ChatsCtrl', function($scope, $ionicLoading, Chats) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -28,44 +32,20 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
   $ionicLoading.show();
-  Chats.all().then(
-    function success(resp) {
-      $scope.chats = resp.data;
-    
-      $ionicLoading.hide();
-    },
-    function error(resp) {
-      $ionicLoading.hide();
-      
-      $ionicPopup.alert({
-        title: 'Authentication Error',
-        template: 'You must be logged in.'
-      }).then(function() {
-        $state.go('login')
-      });
-    }
-  );
+  Chats.all().then(function(res) {
+		$scope.chats = res.data;
+
+		$ionicLoading.hide();
+	});
   
   $scope.remove = function(chat) {
     $ionicLoading.show();
     
-    Chats.remove(chat).then(
-      function success(resp) {
-        $scope.chats = resp.data;
-      
-        $ionicLoading.hide();
-      },
-      function error(resp) {
-        $ionicLoading.hide();
-        
-        $ionicPopup.alert({
-          title: 'Authentication Error',
-          template: 'You must be logged in.'
-        }).then(function() {
-          $state.go('login')
-        });
-      }
-    );
+    Chats.remove(chat).then(function(res) {
+			$scope.chats = res.data;
+
+			$ionicLoading.hide();
+		});
   };
 })
 

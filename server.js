@@ -52,7 +52,7 @@ var router = express.Router(); // get an instance of the express Router
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Content-Length, Accept");
+      "Origin, X-Requested-With, Content-Type, Content-Length, Accept, Authorization");
   res.header("Access-Control-Allow-Methods",
       "GET, POST, PUT, DELETE, OPTIONS");
   
@@ -79,17 +79,19 @@ router.post('/authenticate', function(req, res) {
 
 // middleware to use for all requests below and protect routes
 router.use(function(req, res, next) {
-  var auth = false;
+  var authenticated = false;
   
   // retrieve token
-  var token = req.get('Authorization');
+  var authorizationHeader = req.get('Authorization');
   
   // decode token
-  if (token) {
-    console.log( 'Authorization header: ' + req.get('Authorization') );
+  if (authorizationHeader) {
+		var tmp = authorizationHeader.split(' ');
+		
+		authenticated = jwt.decode(tmp[1], secret).authenticated;
   }
   
-  if (auth) {
+  if (authenticated) {
     // authentication is ok, move to next routes
     next();
   }
