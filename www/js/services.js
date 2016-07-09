@@ -3,13 +3,21 @@ angular.module('starter.services', [])
 .factory('Chats', function($http) {
   return {
     all: function() {
-      return $http.get('http://localhost:8180/api/chats');
+      return $http.get('http://localhost:8180/api/chats').then(function(res) {
+				return res.data;
+			});
     },
     remove: function(chat) {
-      return $http.delete('http://localhost:8180/api/chats/' + chat.id);
+      return $http.delete('http://localhost:8180/api/chats/' + chat.id)
+			.then(function(res) {
+				return res.data;
+			});
     },
     get: function(chatId) {
-      return $http.get('http://localhost:8180/api/chats/' + chatId);
+      return $http.get('http://localhost:8180/api/chats/' + chatId)
+			.then(function(res) {
+				return res.data;
+			});
     }
   };
 })

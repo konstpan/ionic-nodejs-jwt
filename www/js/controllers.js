@@ -31,31 +31,30 @@ angular.module('starter.controllers', [])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-  $ionicLoading.show();
-  Chats.all().then(function(res) {
-		$scope.chats = res.data;
-
-		$ionicLoading.hide();
-	});
-  
-  $scope.remove = function(chat) {
+	$scope.remove = function(chat) {
     $ionicLoading.show();
     
-    Chats.remove(chat).then(function(res) {
-			$scope.chats = res.data;
+    Chats.remove(chat).then(function(chats) {
+			$scope.chats = chats;
 
 			$ionicLoading.hide();
 		});
   };
+	
+  $ionicLoading.show();
+  Chats.all().then(function(chats) {
+		$scope.chats = chats;
+
+		$ionicLoading.hide();
+	});
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, $ionicLoading,
     Chats) {
   $ionicLoading.show();
   
-  Chats.get($stateParams.chatId)
-  .then(function(resp) {
-    $scope.chat = resp.data;
+  Chats.get($stateParams.chatId).then(function(chat) {
+    $scope.chat = chat;
     
     $ionicLoading.hide();
   });
