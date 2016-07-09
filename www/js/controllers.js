@@ -10,11 +10,17 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope) {})
 
-.controller('LoginCtrl', function($scope, $state, $ionicPopup, $http, AuthService) {
+.controller('LoginCtrl', function($scope, $state, $ionicPopup, $http, $ionicLoading, AuthService) {
 	$scope.login = function(user) {
+		$ionicLoading.show();
+		
     AuthService.login(user).then(function(token) {
+			$ionicLoading.hide();
+			
 			$state.go('tab.dash');
 		}, function() {
+			$ionicLoading.hide();
+			
 			$ionicPopup.alert({
         title: 'Authentication Error',
         template: 'Wrong username or password'

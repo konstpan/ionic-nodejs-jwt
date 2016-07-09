@@ -57,7 +57,7 @@ app.use(function(req, res, next) {
       "GET, POST, PUT, DELETE, OPTIONS");
   
   if (req.method === 'OPTIONS') res.status(200).end();
-  else next();
+  else setTimeout(function() {next();}, 250); // simulate remote server delay!!!
 });
 
 // route to authenticate open to everybody
